@@ -1,0 +1,377 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Архитектура вычислений — квест-проект</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #F9F6EE 0%, #EEE7D9 100%);
+            font-family: 'Inter', sans-serif;
+            color: #1e2a2f;
+            line-height: 1.4;
+        }
+
+        /* декоративный паттерн */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(#2c5a6e20 1px, transparent 1px);
+            background-size: 32px 32px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem 2rem 4rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* карточки как листы презентации */
+        .slide {
+            background: rgba(255, 255, 245, 0.96);
+            backdrop-filter: blur(0px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255,235,200,0.8);
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            transition: transform 0.2s ease;
+        }
+
+        .slide:hover {
+            transform: translateY(-4px);
+        }
+
+        h1 {
+            font-size: 3.6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1D4A5B, #2C7A6E);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+        }
+
+        .hero-tag {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #C4452C;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
+        .badge-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin: 1.8rem 0 1.5rem;
+        }
+
+        .badge {
+            background: #E7E0D0;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #2C3E2E;
+            box-shadow: inset 0 -1px 0 #ccbfaa;
+        }
+
+        .quote-call {
+            background: #F0EAD6;
+            border-left: 6px solid #C4452C;
+            padding: 1rem 1.5rem;
+            border-radius: 1.5rem;
+            font-style: italic;
+            font-weight: 500;
+            margin: 1.5rem 0 0;
+        }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 1.2rem;
+        }
+
+        .target-card, .result-card {
+            background: #FDF9F0;
+            border-radius: 1.5rem;
+            padding: 1.4rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            border: 1px solid #F0E2CC;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0 0 0.6rem 0;
+            background: linear-gradient(120deg, #1D4A5B, #2F6B5E);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 0.8rem;
+            margin-bottom: 1rem;
+            color: #2C5A5F;
+        }
+
+        .challenge-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .challenge {
+            background: linear-gradient(105deg, #ffffff 0%, #fef9ef 100%);
+            border-radius: 1.8rem;
+            padding: 1.6rem;
+            border: 1px solid #ffe2b5;
+        }
+
+        .challenge h4 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #B44A2E;
+        }
+
+        .step-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .step-list li {
+            margin-bottom: 0.6rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        .step-list li::before {
+            content: "✔";
+            color: #2C7A6E;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .table-deadline {
+            background: #EFE6D7;
+            border-radius: 1.5rem;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .footer-note {
+            text-align: center;
+            padding: 2rem 0 0;
+            font-size: 0.85rem;
+            color: #6b5a4a;
+            border-top: 1px dashed #dccfba;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 780px) {
+            .container {
+                padding: 1rem;
+            }
+            .slide {
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 2.4rem;
+            }
+            .grid-2col {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+
+        .btn-ghost {
+            background: #2C5A5F;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        hr {
+            margin: 1rem 0;
+            border-color: #eadbbe;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- СЛАЙД 1 :: ГЕРОЙ -->
+    <div class="slide">
+        <div class="hero-tag">Квест-проект • 2026</div>
+        <h1>Архитектура вычислений:<br>Стань инженером сборки ПК!</h1>
+        <p style="font-size: 1.2rem; margin: 1rem 0 0.5rem; font-weight: 500;">Три испытания, команда 3–4 человека, настоящий вызов Хаосу комплектующих. <br>Соберите совместимый компьютер под задачу и получите диплом архитектора!</p>
+        <div class="badge-row">
+            <span class="badge">👥 Команды 3–4 чел</span>
+            <span class="badge">💻 Онлайн-конфигуратор / PCPartPicker</span>
+            <span class="badge">🏅 Сертификат + Диплом</span>
+        </div>
+        <div class="quote-call">
+            «Техника становится продолжением мышления. Докажи, что можешь собрать ПК, который работает как единый механизм».<br>
+            <strong>— Капитан Никита</strong>
+        </div>
+        <div style="margin-top: 1.2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+            <span class="badge">🖥️ Доступ: ПК + интернет</span>
+            <span class="badge">📧 Google-аккаунт (таблица)</span>
+            <span class="badge">⚙️ Логика и инженерное мышление</span>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 2 :: ЦЕЛЕВАЯ АУДИТОРИЯ + РЕЗУЛЬТАТЫ -->
+    <div class="slide">
+        <h2>© ЦЕЛЕВАЯ АУДИТОРИЯ</h2>
+        <p style="margin-top: 0.2rem; font-size: 1rem;"><strong>Для кого этот проект?</strong><br>Ты устал от абстрактных схем? Хочешь понять, что реально внутри системного блока и как это выбирать? Тогда это твой квест!</p>
+        <div class="grid-2col">
+            <div class="target-card">
+                <strong>🎓 Школьники 10 класса</strong><br>Научатся превращать теорию в работающую конфигурацию. Пополнят портфолио инженерным проектом.
+            </div>
+            <div class="target-card">
+                <strong>💡 Будущие IT-специалисты</strong><br>Отработают совместимость сокетов, чипсетов, TDP и форм-факторов в реальных сборках.
+            </div>
+            <div class="target-card">
+                <strong>🤝 Команды единомышленников</strong><br>Совместная сборка ПК под задачу — прокачка коммуникации и технического обоснования.
+            </div>
+            <div class="target-card">
+                <strong>🏆 Для тех, кто ищет вызов</strong><br>Квест-формат с наградами, рецензированием и публичной защитой.
+            </div>
+        </div>
+        <hr>
+        <h2>РЕЗУЛЬТАТЫ</h2>
+        <div class="grid-2col" style="margin-top: 0.5rem;">
+            <div><span style="font-weight:800;">✔ Готовая конфигурация ПК</span><br>Инженерный проект, который не стыдно защитить на уроке информатики.</div>
+            <div><span style="font-weight:800;">✔ Навыки профи</span><br>Сокеты, чипсеты, TDP, форм-факторы, цена/производительность — гуру сборки.</div>
+            <div><span style="font-weight:800;">✔ Диплом + сертификат</span><br>Каждый член отряда получает диплом победителя и сертификат участника.</div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 3 :: ТРИ ИСПЫТАНИЯ (БИТВА) -->
+    <div class="slide">
+        <h2>БИТВА ЗА СОВМЕСТИМОСТЬ</h2>
+        <p style="margin-bottom: 1.2rem; font-size: 1.1rem;">Три легендарных испытания. Каждую неделю ваш отряд осваивает новую зону Архитектуры вычислений.</p>
+        <div class="challenge-grid">
+            <div class="challenge">
+                <h4>🏔️ ЭТАП 1 · Долина Структурных Схем</h4>
+                <p><strong>Укрощение теории:</strong> изучить структурную схему ПК, принципы работы процессора, памяти и системной шины.</p>
+                <ul class="step-list">
+                    <li>Нарисовать/объяснить схему «ЦП → шина → память → ВУ»</li>
+                    <li>Ответить: почему одна программа работает на разных ПК по‑разному?</li>
+                    <li>Заполнить столбцы «Знаю / Интересуюсь» в командной таблице</li>
+                </ul>
+                <div class="table-deadline">📅 Дедлайн: конец 1-й недели</div>
+            </div>
+            <div class="challenge">
+                <h4>🌲 ЭТАП 2 · Лес Потерянных Комплектующих</h4>
+                <p><strong>Спасаем совместимость:</strong> выбрать сценарий (офис, игра, 3D-моделирование) и подобрать комплектующие.</p>
+                <ul class="step-list">
+                    <li>CPU + мат. плата (сокет, чипсет)</li>
+                    <li>ОЗУ, накопитель, БП (TDP, форм-фактор)</li>
+                    <li>Заполнить чек-лист совместимости</li>
+                </ul>
+                <div class="table-deadline">📅 Дедлайн: конец 2-й недели</div>
+            </div>
+            <div class="challenge">
+                <h4>🏰 ЭТАП 3 · Замок Цены и Производительности</h4>
+                <p><strong>Магия обоснования:</strong> подготовить презентацию или инфографику «Наш ПК: почему такой выбор?».</p>
+                <ul class="step-list">
+                    <li>Обосновать бюджет / производительность / надёжность</li>
+                    <li>Ответ на компромисс: скорость vs цена</li>
+                    <li>Ссылка на конфигуратор (PCPartPicker или аналог)</li>
+                </ul>
+                <div class="table-deadline">📅 Дедлайн: конец 3-й недели</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 4 :: КАК СТАТЬ СПАСАТЕЛЕМ / ИНЖЕНЕРОМ -->
+    <div class="slide">
+        <h2>Как стать архитектором вычислений?</h2>
+        <p>Соберите команду, выполните задания и загрузите ссылки в Главный Реестр Инженеров.</p>
+        <div class="grid-2col" style="margin-top: 1.2rem;">
+            <div>
+                <strong>1. Соберите отряд</strong><br>3–4 друга, которые хотят прокачать системное мышление и сборку ПК.
+                <br><br>
+                <strong>2. Рабочий документ</strong><br>Google Документ или таблица с доступом по ссылке (комментирование).
+                <br><br>
+                <strong>3. Этапы 1–3</strong><br>Скопируйте задание из штаба и примените правки (схема, подбор, обоснование).
+            </div>
+            <div>
+                <strong>4. Сдайте в Реестр</strong><br>Вставьте ссылку на документ в таблицу (столбцы Этап 1,2,3).<br><br>
+                <strong>⚡ Что проверяет Хранитель Совместимости?</strong>
+                <ul class="step-list" style="margin-top: 0.5rem;">
+                    <li>Понимание структурной схемы ПК</li>
+                    <li>Совместимость: сокет, чипсет, TDP, форм-фактор</li>
+                    <li>Обоснование под сценарий (бюджет / игры / 3D)</li>
+                    <li>Открытая ссылка для просмотра</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 5 :: ПЛАН ПРОЕКТА + ТАБЛИЦА (аналог из плана) -->
+    <div class="slide">
+        <h2>📅 План проведения проекта</h2>
+        <p><strong>Продолжительность:</strong> 3 недели (10 часов: 2 аудиторных + 8 самостоятельных)</p>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; background: #FEFAF2; border-radius: 1rem; font-size: 0.85rem;">
+                <thead style="background: #E2D8C6;">
+                    <tr><th style="padding: 12px; text-align: left;">Этап</th><th style="padding: 12px; text-align: left;">Деятельность</th><th style="padding: 12px; text-align: left;">Срок</th></tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom:1px solid #EADBBC;"><td style="padding: 10px;"><strong>Подготовительный</strong></td><td style="padding: 10px;">Регистрация команд, знакомство с вводной презентацией, заполнение З-И-У-К</td><td style="padding: 10px;">Неделя 1 (0,5 ч)</td></tr>
+                    <tr style="border-bottom:1px solid #EADBBC;"><td style="padding: 10px;"><strong>Основной (сам. работа, 8 ч)</strong></td><td style="padding: 10px;">Изучение схемы ПК → выбор сценария → подбор в конфигураторе → чек-лист совместимости → презентация</td><td style="padding: 10px;">Неделя 1–3</td></tr>
+                    <tr><td style="padding: 10px;"><strong>Заключительный</strong></td><td style="padding: 10px;">Взаимное рецензирование, самооценка, защита лучших работ, рефлексия З-И-У-К</td><td style="padding: 10px;">Неделя 3 (финал)</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="margin-top: 1rem; background: #2C5A5F10; border-radius: 1rem; padding: 1rem;">
+            <strong>🏆 Номинации победителей:</strong> «Лучшая совместимость», «Креативное обоснование», «Бюджетный шедевр»
+        </div>
+    </div>
+
+    <!-- СЛАЙД 6 :: ПРИСОЕДИНЯЙСЯ + ФИНАЛ -->
+    <div class="slide">
+        <h2>Присоединяйся к отрядам сборки!</h2>
+        <p>Проект уже стартовал, но вы всё ещё можете вступить. Выполните три боевых задания, получите диплом и превратите свои знания о ПК в настоящий инженерный проект.</p>
+        <div class="quote-call" style="margin-top: 1rem;">
+            📎 <strong>Как сдать работу</strong><br>
+            Проект «Архитектура вычислений» · Хранитель Совместимости & Капитан Никита<br>
+            Все этапы проверяются в Главном Реестре Инженеров. Победители получают дипломы и сертификаты.<br>
+            <strong>Дедлайн финала — конец 3-й недели. Успевайте!</strong>
+        </div>
+        <div class="footer-note" style="border: none; margin-top: 1rem;">
+            © 2026 Магия структурной схемы и умного выбора<br>
+            ГрГУ имени Янки Купалы · Данилевич Никита Юрьевич · Сетевой проект
+        </div>
+    </div>
+</div>
+</body>
+</html>
