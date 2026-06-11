@@ -1,0 +1,421 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Архитектура вычислений · Сетевой проект</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f4fa;
+            color: #1a2c3e;
+            scroll-behavior: smooth;
+        }
+
+        /* navigation */
+        .nav-slider {
+            position: sticky;
+            top: 0;
+            background: rgba(10, 25, 47, 0.92);
+            backdrop-filter: blur(12px);
+            z-index: 100;
+            padding: 0.8rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: #eef4ff;
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .nav-btn i {
+            margin-right: 6px;
+            font-size: 0.9rem;
+        }
+
+        .nav-btn:hover {
+            background: #2c3e66;
+            color: white;
+        }
+
+        .nav-btn.active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 8px rgba(59,130,246,0.4);
+        }
+
+        /* slide container */
+        .slides-container {
+            scroll-snap-type: y mandatory;
+            overflow-y: scroll;
+            height: 100vh;
+            scroll-behavior: smooth;
+        }
+
+        .slide {
+            scroll-snap-align: start;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            border-bottom: 1px solid #e2e8f0;
+            background: #ffffff;
+        }
+
+        .slide:nth-child(even) {
+            background: #fefefe;
+        }
+
+        .card-slide {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
+            padding: 2rem 2.2rem;
+            transition: transform 0.2s;
+        }
+
+        /* typography */
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1E3A8A, #3B82F6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            border-left: 6px solid #3b82f6;
+            padding-left: 1rem;
+            margin: 1.5rem 0 1rem 0;
+        }
+
+        h3 {
+            font-weight: 600;
+            font-size: 1.3rem;
+            margin-top: 1rem;
+            color: #0f3b5c;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            border-radius: 40px;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 0.6rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.8rem;
+            margin: 1.5rem 0;
+        }
+
+        .info-card {
+            background: #f8fafc;
+            border-radius: 1.5rem;
+            padding: 1.3rem;
+            border: 1px solid #e2edff;
+        }
+
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .timeline-item {
+            background: #f1f5f9;
+            padding: 0.8rem 1.2rem;
+            border-radius: 1rem;
+            border-left: 5px solid #3b82f6;
+        }
+
+        .quote {
+            font-style: italic;
+            font-size: 1.2rem;
+            background: #eef2ff;
+            padding: 1.2rem;
+            border-radius: 2rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 0.75rem;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #eef2ff;
+            font-weight: 600;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #5b6e8c;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 2rem;
+            padding-top: 1rem;
+        }
+
+        @media (max-width: 700px) {
+            .card-slide {
+                padding: 1.2rem;
+            }
+            h1 {
+                font-size: 2.2rem;
+            }
+            .nav-btn {
+                padding: 0.3rem 0.9rem;
+                font-size: 0.75rem;
+            }
+        }
+
+        .icon-text i {
+            width: 28px;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="nav-slider" id="navBar">
+    <button class="nav-btn" data-slide="0"><i class="fas fa-microchip"></i> Обзор</button>
+    <button class="nav-btn" data-slide="1"><i class="fas fa-bullseye"></i> Аннотация</button>
+    <button class="nav-btn" data-slide="2"><i class="fas fa-brain"></i> Результаты</button>
+    <button class="nav-btn" data-slide="3"><i class="fas fa-question-circle"></i> Вопросы</button>
+    <button class="nav-btn" data-slide="4"><i class="fas fa-calendar-alt"></i> План этапов</button>
+    <button class="nav-btn" data-slide="5"><i class="fas fa-users"></i> Оценивание & продукты</button>
+    <button class="nav-btn" data-slide="6"><i class="fas fa-chalkboard-teacher"></i> Дифференциация</button>
+</div>
+
+<div class="slides-container" id="slidesContainer">
+    <!-- СЛАЙД 0 - ТИТУЛ/ОБЗОР -->
+    <div class="slide">
+        <div class="card-slide">
+            <div style="text-align: center; margin-bottom: 1rem;">
+                <i class="fas fa-cpu" style="font-size: 3.5rem; color: #3b82f6;"></i>
+            </div>
+            <h1 style="text-align: center;">Архитектура вычислений</h1>
+            <p style="text-align: center; font-size: 1.2rem; color: #2c3e66;">Сетевой проект · 10 класс · информатика</p>
+            <div class="quote" style="margin: 1.5rem 0;">«Понимать, как устроено — значит уметь выбирать.»</div>
+            <div class="grid-2">
+                <div class="info-card"><i class="fas fa-user-graduate"></i> <strong>Автор:</strong> Данилевич Никита Юрьевич<br> <i class="fas fa-map-marker-alt"></i> Гродно, Гродненская область<br> <i class="fas fa-university"></i> ГрГУ им. Янки Купалы</div>
+                <div class="info-card"><i class="fas fa-clock"></i> <strong>Продолжительность:</strong> 3 недели (10 часов)<br> <i class="fas fa-laptop-house"></i> Форма: дистанционная<br> <i class="fas fa-users"></i> Возраст: 15-16 лет (10 класс)</div>
+            </div>
+            <div><span class="badge">Предметная область</span> Информатика, среднее общее образование, стандарт «Компьютер как универсальное устройство обработки информации»</div>
+            <div><span class="badge">Межпредметные связи</span> Информатика 10 класс, IT-профиль</div>
+            <div class="footer-note">Купаловские проекты, 2026 · проект сетевого взаимодействия</div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 1 - аннотация, цель, практический результат -->
+    <div class="slide">
+        <div class="card-slide">
+            <h2><i class="fas fa-bullseye"></i> Краткая аннотация</h2>
+            <p><strong>Цель проекта:</strong> научиться понимать принципы работы программного и аппаратного обеспечения компьютера.</p>
+            <p><strong>Практический результат:</strong> участники соберут виртуальную модель компьютера из большого списка комплектующих, обосновав совместимость и назначение.</p>
+            <div style="background: #eef2ff; padding: 1rem; border-radius: 1rem; margin: 1rem 0;">
+                <i class="fas fa-hourglass-half"></i> <strong>Трудоёмкость:</strong> 10 часов<br>
+                🏫 Урочная деятельность: 2 часа &nbsp;|&nbsp; 🏠 Самостоятельная работа: 8 часов
+            </div>
+            <h3>Учебное содержание</h3>
+            <ul style="margin-left: 1.5rem;">
+                <li>Структурная схема компьютера.</li>
+                <li>Процессор, виды и назначение памяти, системная шина.</li>
+                <li>Виды и назначение внешних устройств.</li>
+                <li>Принципы работы аппаратных средств компьютера.</li>
+            </ul>
+            <p><span class="badge">Учебная тема</span> <strong>КОМПЬЮТЕР КАК УНИВЕРСАЛЬНОЕ УСТРОЙСТВО ОБРАБОТКИ ИНФОРМАЦИИ</strong></p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 2 - планируемые результаты обучения (личностные, метапредметные, предметные) -->
+    <div class="slide">
+        <div class="card-slide">
+            <h2><i class="fas fa-chalkboard"></i> Планируемые результаты</h2>
+            <div class="grid-2">
+                <div class="info-card"><i class="fas fa-heart" style="color:#e11d48;"></i> <strong>Личностные</strong><br>Готовность к самообразованию и осознанному выбору IT-профиля.</div>
+                <div class="info-card"><i class="fas fa-arrows-alt"></i> <strong>Метапредметные</strong><br>✔ планирование сборки ПК под задачу<br>✔ работа с тех. документацией и онлайн-конфигураторами</div>
+                <div class="info-card"><i class="fas fa-microchip"></i> <strong>Предметные</strong><br>1) называть основные компоненты ПК и их функции<br>2) объяснять принципы работы процессора и памяти<br>3) собирать совместимую конфигурацию компьютера.</div>
+            </div>
+            <h3>Образовательные стандарты (ориентир)</h3>
+            <p>Проект реализует требования ГОС по теме «Компьютер как универсальное устройство обработки информации»: освоение структурной схемы, принципов работы аппаратных средств, совместимости устройств.</p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 3 - вопросы направляющие проект (основополагающий, проблемные, частные) -->
+    <div class="slide">
+        <div class="card-slide">
+            <h2><i class="fas fa-question-circle"></i> Вопросы, направляющие проект</h2>
+            <div class="quote" style="background:#dbeafe;">🔍 <strong>Основополагающий вопрос:</strong> Как техника становится продолжением нашего мышления?</div>
+            <h3><i class="fas fa-exclamation-triangle"></i> Проблемные вопросы</h3>
+            <ul>
+                <li>1. Как структурная схема определяет реальную производительность?</li>
+                <li>2. Почему одна и та же программа работает на разных ПК по‑разному?</li>
+                <li>3. Как выбрать компромисс между ценой, скоростью и надёжностью?</li>
+            </ul>
+            <h3><i class="fas fa-list-ul"></i> Частные вопросы (учебной темы)</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 0.5rem;">
+                <span class="badge" style="background:#e9ecef;">Из чего состоит системный блок?</span>
+                <span class="badge" style="background:#e9ecef;">Что такое тактовая частота?</span>
+                <span class="badge" style="background:#e9ecef;">Для чего нужна видеокарта?</span>
+                <span class="badge" style="background:#e9ecef;">Чем SSD отличается от HDD?</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 4 - подробный план проведения проекта (из Плана проекта) -->
+    <div class="slide">
+        <div class="card-slide">
+            <h2><i class="fas fa-calendar-week"></i> План проведения (3 недели)</h2>
+            <div class="timeline">
+                <div class="timeline-item"><strong>📌 Подготовительный этап (Неделя 1, 0-й час)</strong><br>Регистрация команд, выбор названия, знакомство с вводной презентацией, заполнение таблицы З-И-У-К (Знаю/Интересуюсь), получение шаблонов.</div>
+                <div class="timeline-item"><strong>⚙ Основной этап (8 ч самостоятельной работы)</strong><br>
+                    • Изучение структурной схемы ПК, процессора, памяти.<br>
+                    • Выбор сценария (бюджетный офис, игровая станция, 3D-моделирование).<br>
+                    • Подбор комплектующих в онлайн-конфигураторе (pcpartpicker) с обоснованием.<br>
+                    • Заполнение чек-листа совместимости (сокет, чипсет, TDP, форм-фактор).<br>
+                    • Подготовка презентации/инфографики «Наш ПК: почему такой выбор?».
+                </div>
+                <div class="timeline-item"><strong>🏆 Заключительный этап (Неделя 3)</strong><br>
+                    Взаимное рецензирование конфигураций, заполнение листа самооценки, публичная защита лучших работ (видеоконференция/форум), рефлексия (З-И-У-К), подведение итогов с номинациями: «Лучшая совместимость», «Креативное обоснование», «Бюджетный шедевр».
+                </div>
+            </div>
+            <p style="margin-top: 1rem;"><i class="fas fa-link"></i> Полный детализированный календарь — см. страницу «План проекта» (вкладка документов). Урочная деятельность: 2 часа (вводный и защита).</p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 5 - оценивание, методы + продукты проектной деятельности -->
+    <div class="slide">
+        <div class="card-slide">
+            <h2><i class="fas fa-clipboard-list"></i> План оценивания & продукты</h2>
+            <p><strong>Методы формирующего оценивания:</strong> таблица З-И-У-К, чек-листы совместимости, взаимное рецензирование по критериям, самооценка команды, публичная защита.</p>
+            <div style="background: #f1f5f9; border-radius: 1rem; padding: 1rem; margin: 1rem 0;">
+                <i class="fas fa-graduation-cap"></i> <strong>Продукты проектной деятельности (примеры):</strong> 
+                коллективная карта комплектующих, презентация конфигурации, интерактивный плакат (рисунок), совместный блог/отчёт о сборке ПК. Каждая команда создаёт виртуальную модель ПК с обоснованием.
+            </div>
+            <h3>Критерии оценки работ</h3>
+            <ul>
+                <li>✓ Совместимость компонентов (сокет, чипсет, питание)</li>
+                <li>✓ Соответствие выбранному сценарию использования</li>
+                <li>✓ Аргументация соотношения цена/производительность</li>
+                <li>✓ Качество презентации / инфографики</li>
+            </ul>
+            <p><span class="badge">Форма проведения</span> дистанционная (Google-формы, конфигураторы, видеозвонки).</p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 6 - дифференцированное обучение + ресурсы (оборудование, ПО, интернет) -->
+    <div class="slide">
+        <div class="card-slide">
+            <h2><i class="fas fa-layer-group"></i> Дифференцированное обучение</h2>
+            <div class="grid-2">
+                <div class="info-card"><i class="fas fa-hands-helping"></i> <strong>Обучающиеся с трудностями</strong><br>На сайте проекта размещены готовые образцы заданий, шаблоны чек-листов, примеры сборки ПК. Принцип «МИНИМАКСА»: каждый достигает социально безопасного минимума.</div>
+                <div class="info-card"><i class="fas fa-language"></i> <strong>Язык не родной</strong><br>Предусмотрены наглядные схемы, глоссарий на русском, визуальные инструкции в конфигураторах.</div>
+                <div class="info-card"><i class="fas fa-star"></i> <strong>Одарённые ученики</strong><br>Дополнительные задания: сравнение альтернативных архитектур (Intel vs AMD), анализ энергоэффективности, создание сравнительной таблицы бенчмарков.</div>
+            </div>
+            <hr style="margin: 1rem 0;">
+            <h3><i class="fas fa-microchip"></i> Материалы и ресурсы</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+                <div><i class="fas fa-desktop"></i> <strong>Оборудование:</strong> ПК/ноутбуки с доступом в интернет</div>
+                <div><i class="fas fa-code"></i> <strong>ПО:</strong> онлайн-конфигураторы (pcpartpicker), Google Slides, Google Docs, сервисы веб 2.0</div>
+                <div><i class="fas fa-globe"></i> <strong>Интернет-источники:</strong> документация производителей, обзоры, сайты совместимости, видеолекции по архитектуре ПК.</div>
+            </div>
+            <div class="quote" style="margin-top: 1.2rem; font-size: 0.9rem;"><i class="fab fa-google"></i> Web-сервисы: страница «Сервисы веб 2.0» проекта, коллективные доски, ментальные карты. Взаимодействие координаторов через чат и форум.</div>
+            <div class="footer-note">© Купаловские проекты, 2026 · Организация взаимодействия: координаторы команд получают доступ к шаблонам и материалам на портале проекта.</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const slides = document.querySelectorAll('.slide');
+    const container = document.getElementById('slidesContainer');
+    const navBtns = document.querySelectorAll('.nav-btn');
+
+    function updateActiveButton() {
+        const scrollTop = container.scrollTop;
+        const slideHeight = slides[0]?.clientHeight || 0;
+        const activeIndex = Math.round(scrollTop / slideHeight);
+        navBtns.forEach((btn, idx) => {
+            const slideIndex = parseInt(btn.getAttribute('data-slide'), 10);
+            if (slideIndex === activeIndex) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+
+    function scrollToSlide(index) {
+        if (slides[index]) {
+            const slideTop = slides[index].offsetTop;
+            container.scrollTo({ top: slideTop, behavior: 'smooth' });
+        }
+    }
+
+    navBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const slideIdx = parseInt(btn.getAttribute('data-slide'), 10);
+            scrollToSlide(slideIdx);
+        });
+    });
+
+    container.addEventListener('scroll', () => {
+        updateActiveButton();
+    });
+
+    // initial active state
+    setTimeout(() => {
+        updateActiveButton();
+    }, 200);
+    window.addEventListener('resize', () => updateActiveButton());
+
+    // Additional: minor fix for scroll snap + button highlight after manual scroll
+    container.addEventListener('scrollend', () => updateActiveButton());
+</script>
+</body>
+</html>
